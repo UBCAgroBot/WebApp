@@ -1,0 +1,9 @@
+# npm
+node_modules/
+
+# IDE
+.idea
+.vscode
+
+# Finder (MacOS) folder config
+.DS_Store
