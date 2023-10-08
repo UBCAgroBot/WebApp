@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "mock-robot"
+version = "0.1.0"
+description = "A simple websocket server that mocks the robot's camera feed"
+authors = ["UBC Agrobot"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+opencv-python = "^4.8.1.78"
+websockets = "^11.0.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
