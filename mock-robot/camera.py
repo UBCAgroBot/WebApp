@@ -24,7 +24,7 @@ async def send_camera_feed(websocket, path):
             frame_base64 = base64.b64encode(buffer)
 
             # Send frame to WebSocket server
-            await websocket.send(frame_base64)
+            await websocket.send(f"data:image/jpeg;base64,{frame_base64.decode('utf-8')}")
     except Exception as e:
         print(f"Error: {e}")
     finally:

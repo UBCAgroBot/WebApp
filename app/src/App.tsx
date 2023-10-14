@@ -1,14 +1,14 @@
-import './App.css'
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react';
+import './App.css';
 
 const App = () => {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
     console.log('Attempting to establish WebSocket connection...');
 
-    socketRef.current = new WebSocket("ws://localhost:6969");
+    socketRef.current = new WebSocket('ws://localhost:6969');
 
     socketRef.current.onopen = () => {
       console.log('WebSocket connection established!');
@@ -20,33 +20,35 @@ const App = () => {
 
     // Handle incoming video frames
     socketRef.current.onmessage = (event) => {
-      if (event.data instanceof Blob) {
-        const blob = event.data;
-        console.log('Received video frame:', blob.size, 'bytes')
+      console.log(
+        'Received video frame:',
+        event.data.slice(0, 100),
+        '...'
+      );
 
-        // Decode and display the received frame
-        const imageUrl = URL.createObjectURL(blob);
+      const img = imageRef.current;
 
-        const video = videoRef.current;
-
-        if (video) {
-          video.src = imageUrl;
-        }
-      } else {
-        console.error('Invalid data received:', event.data);
+      if (img) {
+        img.src = event.data;
       }
     };
 
     // Handle closing of the WebSocket connection before page unload
     window.addEventListener('beforeunload', () => {
-      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      if (
+        socketRef.current &&
+        socketRef.current.readyState === WebSocket.OPEN
+      ) {
         socketRef.current.close();
       }
     });
 
     // Clean up the WebSocket connection when the component unmounts
     return () => {
-      if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      if (
+        socketRef.current &&
+        socketRef.current.readyState === WebSocket.OPEN
+      ) {
         socketRef.current.close();
       }
     };
@@ -54,9 +56,9 @@ const App = () => {
 
   return (
     <div>
-      <video ref={videoRef} controls></video>
+      <img ref={imageRef}/>
     </div>
   );
-}
+};
 
-export default App
+export default App;
