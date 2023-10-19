@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 
 const App = () => {
+  const [isBlackAndWhite, setIsBlackAndWhite] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
 
@@ -20,17 +21,13 @@ const App = () => {
 
     // Handle incoming video frames
     socketRef.current.onmessage = (event) => {
-      console.log(
-        'Received video frame:',
-        event.data.slice(0, 100),
-        '...'
-      );
-
       const img = imageRef.current;
 
       if (img) {
         img.src = event.data;
       }
+
+      socketRef.current?.send(JSON.stringify({ blackAndWhite: isBlackAndWhite }));
     };
 
     // Handle closing of the WebSocket connection before page unload
@@ -52,11 +49,17 @@ const App = () => {
         socketRef.current.close();
       }
     };
-  }, []);
+  }, [isBlackAndWhite]);
 
   return (
     <div>
-      <img ref={imageRef}/>
+      <img ref={imageRef} width='75%' alt='Video feed' />
+      <br />
+      <button onClick={() => {
+        setIsBlackAndWhite(!isBlackAndWhite)
+      }}>
+        {isBlackAndWhite ? 'Show Color' : 'Show Black & White'}
+      </button>
     </div>
   );
 };
