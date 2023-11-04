@@ -3,7 +3,7 @@ import './App.css';
 
 const App = () => {
   const [isBlackAndWhite, setIsBlackAndWhite] = useState(false);
-  const imageRef = useRef<HTMLImageElement | null>(null);
+  const [src, setSrc] = useState('');
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -21,13 +21,17 @@ const App = () => {
 
     // Handle incoming video frames
     socketRef.current.onmessage = (event) => {
-      const img = imageRef.current;
+      const blob = new Blob([event.data], { type: 'src/jpeg' });
+      const url = URL.createObjectURL(blob);
 
-      if (img) {
-        img.src = event.data;
+      // Revoke the previous object URL to avoid memory leaks
+      if (src) {
+        URL.revokeObjectURL(src);
       }
 
-      socketRef.current?.send(JSON.stringify({ blackAndWhite: isBlackAndWhite }));
+      setSrc(url);
+
+      // socketRef.current?.send(JSON.stringify({ blackAndWhite: isBlackAndWhite }));
     };
 
     // Handle closing of the WebSocket connection before page unload
@@ -53,11 +57,13 @@ const App = () => {
 
   return (
     <div>
-      <img ref={imageRef} width='75%' alt='Video feed' />
+      <img src={src} width='75%' alt='Video feed' />
       <br />
-      <button onClick={() => {
-        setIsBlackAndWhite(!isBlackAndWhite)
-      }}>
+      <button
+        onClick={() => {
+          setIsBlackAndWhite(!isBlackAndWhite)
+        }}
+        disabled>
         {isBlackAndWhite ? 'Show Color' : 'Show Black & White'}
       </button>
     </div>
